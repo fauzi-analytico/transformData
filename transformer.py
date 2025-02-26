@@ -22,9 +22,12 @@ if uploaded_file is not None:
     # Convert 'Created' column to datetime
     df['Created'] = pd.to_datetime(df['Created'], format='%m/%d/%Y %I:%M%p')
 
-    # Function to format date without leading zeros
+    # Function to format date properly (removing leading zeros)
     def format_date(dt):
-        return f"{dt.month}/{dt.day}/{dt.year} {dt.hour if dt.hour != 0 else 12}:{dt.minute:02d} {'AM' if dt.hour < 12 else 'PM'}"
+        hour_12 = dt.strftime("%I").lstrip("0")  # Convert to 12-hour format and remove leading zero
+        minute = dt.strftime("%M")  # Keep minute as-is
+        am_pm = dt.strftime("%p")  # Get AM/PM
+        return f"{dt.month}/{dt.day}/{dt.year} {hour_12}:{minute} {am_pm}"
 
     # Apply formatting to 'Created'
     df['Created'] = df['Created'].apply(format_date)
