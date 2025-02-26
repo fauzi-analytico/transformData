@@ -13,7 +13,7 @@ uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
 if uploaded_file is not None:
     # Load the data
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(uploaded_file, dtype=str)  # Read as string to prevent number conversion
 
     # Display the original data
     st.write("Original Data:")
@@ -40,6 +40,13 @@ if uploaded_file is not None:
 
     # Insert the new column at column 2
     df.insert(1, 'Created + Hours', df.pop('Created + Hours'))
+
+    # Ensure 'Phone' and 'Secondary phone number' remain as text
+    phone_columns = ['Phone', 'Secondary phone number']
+    for col in phone_columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str)  # Convert to string
+            df[col] = df[col].apply(lambda x: f"'{x}" if x.isnumeric() else x)  # Add single quote to force text
 
     # Display the modified data
     st.write("Modified Data:")
