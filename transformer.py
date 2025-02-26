@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import csv  # Import CSV for proper quoting
 from datetime import datetime, timedelta
 
 # Streamlit App Title
@@ -13,7 +14,7 @@ uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
 if uploaded_file is not None:
     # Load the data, reading phone numbers as strings to avoid scientific notation
-    df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)  # Prevents NaN
+    df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)  # Prevents NaN from appearing
 
     # Display the original data
     st.write("Original Data:")
@@ -51,8 +52,8 @@ if uploaded_file is not None:
     st.write("Modified Data:")
     st.dataframe(df)
 
-    # Convert DataFrame to CSV (no extra formatting)
-    csv = df.to_csv(index=False, quoting=3)  # quoting=3 ensures no unnecessary quotes
+    # Convert DataFrame to CSV (handling special characters properly)
+    csv = df.to_csv(index=False, quoting=csv.QUOTE_MINIMAL, escapechar="\\")  # Ensure correct formatting
 
     # Download the modified CSV
     st.download_button(
