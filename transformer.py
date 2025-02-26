@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # Streamlit App Title
 st.title("CSV Date Formatter and Time Adjuster")
@@ -19,15 +19,21 @@ if uploaded_file is not None:
     st.write("Original Data:")
     st.dataframe(df)
 
-    # Convert 'Created' column to datetime and reformat
+    # Convert 'Created' column to datetime
     df['Created'] = pd.to_datetime(df['Created'], format='%m/%d/%Y %I:%M%p')
 
-    # Reformat the date without leading zeros in month and day
-    df['Created'] = df['Created'].dt.strftime('%-m/%-d/%Y %-I:%M %p')  # No leading zeros
+    # Function to format date without leading zeros
+    def format_date(dt):
+        return f"{dt.month}/{dt.day}/{dt.year} {dt.hour if dt.hour != 0 else 12}:{dt.minute:02d} {'AM' if dt.hour < 12 else 'PM'}"
+
+    # Apply formatting to 'Created'
+    df['Created'] = df['Created'].apply(format_date)
 
     # Create new column with added hours
-    df['Created + Hours'] = pd.to_datetime(df['Created'], format='%-m/%-d/%Y %I:%M %p') + timedelta(hours=hours_to_add)
-    df['Created + Hours'] = df['Created + Hours'].dt.strftime('%-m/%-d/%Y %-I:%M %p')  # Ensure no leading zero
+    df['Created + Hours'] = pd.to_datetime(df['Created'], format='%m/%d/%Y %I:%M %p') + timedelta(hours=hours_to_add)
+
+    # Apply the same formatting function to the new column
+    df['Created + Hours'] = df['Created + Hours'].apply(format_date)
 
     # Insert the new column at column 2
     df.insert(1, 'Created + Hours', df.pop('Created + Hours'))
