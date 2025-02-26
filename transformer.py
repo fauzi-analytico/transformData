@@ -12,8 +12,8 @@ hours_to_add = st.selectbox("Select number of hours to add (1-23):", range(1, 24
 uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
 if uploaded_file is not None:
-    # Load the data
-    df = pd.read_csv(uploaded_file, dtype=str)  # Read as string to prevent number conversion
+    # Load the data, reading phone numbers as strings to avoid scientific notation
+    df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)  # Prevents NaN
 
     # Display the original data
     st.write("Original Data:")
@@ -41,19 +41,20 @@ if uploaded_file is not None:
     # Insert the new column at column 2
     df.insert(1, 'Created + Hours', df.pop('Created + Hours'))
 
-    # Ensure 'Phone' and 'Secondary phone number' remain as text
+    # Ensure 'Phone' and 'Secondary phone number' remain as plain numbers (no formatting)
     phone_columns = ['Phone', 'Secondary phone number']
     for col in phone_columns:
         if col in df.columns:
-            df[col] = df[col].astype(str)  # Convert to string
-            df[col] = df[col].apply(lambda x: f"'{x}" if x.isnumeric() else x)  # Add single quote to force text
+            df[col] = df[col].astype(str).replace('nan', '')  # Convert NaNs to empty strings
 
     # Display the modified data
     st.write("Modified Data:")
     st.dataframe(df)
 
+    # Convert DataFrame to CSV (no extra formatting)
+    csv = df.to_csv(index=False, quoting=3)  # quoting=3 ensures no unnecessary quotes
+
     # Download the modified CSV
-    csv = df.to_csv(index=False)
     st.download_button(
         label="Download Edited CSV",
         data=csv,
