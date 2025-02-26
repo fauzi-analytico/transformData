@@ -23,11 +23,11 @@ if uploaded_file is not None:
     df['Created'] = pd.to_datetime(df['Created'], format='%m/%d/%Y %I:%M%p')
 
     # Reformat the date without leading zeros in month and day
-    df['Created'] = df['Created'].dt.strftime('%-m/%-d/%Y %-I:%M %p')  # Ensure no leading zeros in month, day, and hour
+    df['Created'] = df['Created'].dt.strftime('%-m/%-d/%Y %-I:%M %p')  # No leading zeros
 
     # Create new column with added hours
-    df['Created + Hours'] = pd.to_datetime(df['Created'], format='%m/%d/%Y %I:%M %p') + timedelta(hours=hours_to_add)
-    df['Created + Hours'] = df['Created + Hours'].dt.strftime('%-I:%M %p')  # Ensure no leading zero in hours and remove seconds
+    df['Created + Hours'] = pd.to_datetime(df['Created'], format='%-m/%-d/%Y %I:%M %p') + timedelta(hours=hours_to_add)
+    df['Created + Hours'] = df['Created + Hours'].dt.strftime('%-m/%-d/%Y %-I:%M %p')  # Ensure no leading zero
 
     # Insert the new column at column 2
     df.insert(1, 'Created + Hours', df.pop('Created + Hours'))
